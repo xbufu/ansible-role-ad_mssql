@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: ad_mssql
+  author: xbufu
+  description: AD MSSQL role.
+  company: Bufu-Security
+  license: license (BSD, MIT)
+  min_ansible_version: "2.1"
+  platforms:
+    - name: Windows
+      versions: all
+
+  galaxy_tags:
+    - windows
+    - ad
+    - dc
+    - mssql
+    - ssms

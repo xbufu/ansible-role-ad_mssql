@@ -1,0 +1,33 @@
+---
+- name: Check for installed SQL instances
+  ansible.windows.win_reg_stat:
+    path: 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server'
+    name: InstalledInstances
+  register: sql
+
+- name: Install SQL Engine if instance does not already exists
+  when: (not sql.exists) or (sql_instance_name not in sql.value)
+  block:
+    - name: Create configuration file
+      ansible.windows.win_template:
+        src: sqlsrv_{{ sql_version }}_config.ini.j2
+        dest: '{{ sql_config_path }}'
+
+    - name: Mount SQL install ISO
+      community.windows.win_disk_image:
+        image_path: '{{ sql_iso_path }}'
+        state: present
+      register: iso_mount
+
+    - name: Install SQL Engine
+      ansible.windows.win_shell: '{{ iso_mount.mount_paths[0] }}setup.exe /ConfigurationFile={{ sql_config_path }}'
+
+    - name: Unmount ISO
+      community.windows.win_disk_image:
+        image_path: '{{ sql_iso_path }}'
+        state: absent
+
+    - name: Remove config file
+      ansible.windows.win_file:
+        path: '{{ sql_config_path }}'
+        state: absent

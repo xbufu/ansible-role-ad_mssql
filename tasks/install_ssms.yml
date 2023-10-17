@@ -1,0 +1,16 @@
+---
+- name: Check if SSMS is already installed
+  ansible.windows.win_reg_stat:
+    path: 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\160\Tools\ClientSetup'
+  register: ssms_install
+
+- name: Install SSMS if it doesn't exist
+  when: not ssms_install.exists
+  block:
+    - name: Install SSMS
+      ansible.windows.win_shell: '{{ ssms_setup_path }} /install /passive /norestart'
+      register: ssms
+
+    - name: Reboot if required
+      ansible.windows.win_reboot:
+      when: ssms.changed

@@ -1,0 +1,6 @@
+---
+- name: Install a new SQL Engine instance
+  ansible.builtin.include_tasks: install_sql_engine.yml
+
+- name: Install SSMS
+  ansible.builtin.include_tasks: install_ssms.yml
